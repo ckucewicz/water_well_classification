@@ -8,10 +8,14 @@ Water from these wells is not only vital for drinking but also essential for coo
 ## Business Goals
 The primary focus of this machine learning project is to assist the NGO in identifying all water wells requiring repair, enabling timely interventions to ensure safe, clean water for Tanzanians. The project aims to accurately identify every positive case (water well in need of repair) while minimizing false negatives, which occur when a well is incorrectly classified as functioning properly when, in reality, it is in need of repair.
 
-Although some functional wells may be incorrectly flagged as needing repair, the prevention of potential health hazards is of utmost importance. Therefore, the model prioritizes accurately identifying wells that truly need repair, erring on the side of caution, thereby safeguarding the lives of citizens who depend on these essential water sources.
+Although some functional wells may be incorrectly classified as needing repair, the prevention of potential health hazards is of utmost importance. Therefore, the model prioritizes identifying wells that need repair, erring on the side of caution to ensure the safety of citizens who rely on these essential water sources.
 
 ## Business Success Criteria
-The success of this project will be measured primarily by the model’s recall metric, which addresses the question: “Out of all the wells that actually need repair, what percentage did our model correctly identify as needing repair?” Recall is calculated by dividing the number of true positives (the number of wells that genuinely require repair) by the combined total of true positives and false negatives (the wells that require repair but were incorrectly labeled as functional). 
+The success of this project will be measured primarily by the model’s ability to classify wells in need of repair. The key metric associated with this ability is called recall, which addresses the question: 
+
+> _“Out of all the wells that actually need repair, what percentage did our model correctly identify as needing repair?”_ 
+
+Recall is calculated by dividing the number of true positives (the number of wells that genuinely require repair) by the combined total of true positives and false negatives (the wells that require repair but were incorrectly labeled as functional). 
 
 $$
 \text{Recall} = \frac {\text{True  Positives}}{\text{True  Positives + False  Negatives}}
