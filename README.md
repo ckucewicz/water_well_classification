@@ -1,16 +1,18 @@
-# Business Understanding
+# Water Well Classification Project
+Author: [Chris Kucewicz](https://www.linkedin.com/in/chriskucewicz/)
+## Business Understanding
 
-## Background
+### Background
 The country of Tanzania is struggling to provide safe, clean water to its more than 67 million citizens. A non-governmental organization (NGO) is assisting the Tanzanian government in addressing this critical issue by repairing damaged water wells. With over 70k water wells scattered across an area larger than twice the size of California, testing every single well is both costly and time-consuming.
 
 Water from these wells is not only vital for drinking but also essential for cooking, sanitation, and hygiene practices. Ensuring access to clean water significantly impacts the health and livelihoods of the community. Therefore, the NGO requires an efficient method to identify which water wells need repair, streamlining their efforts to provide safe, clean water for all Tanzanians.
 
-## Business Goals
+### Business Goals
 The primary focus of this machine learning project is to assist the NGO in identifying all water wells requiring repair, enabling timely interventions to ensure safe, clean water for Tanzanians. Specifically, the project aims to accurately identify every well in need of repair while minimizing false ***negatives***—cases where a well is incorrectly classified as functioning when, in fact, it requires repair.
 
 Although some functional wells may be incorrectly classified as needing repair, the prevention of potential health hazards is of utmost importance. Therefore, the model prioritizes identifying wells that need repair, erring on the side of caution to ensure the safety of citizens who rely on these essential water sources.
 
-## Business Success Criteria
+### Business Success Criteria
 The success of this project will be measured primarily by the model’s ability to classify wells in need of repair. The key metric associated with this ability is called recall, which addresses the question: 
 
 > _“Out of all the wells that actually need repair, what percentage did our model correctly identify as needing repair?”_ 
@@ -25,7 +27,7 @@ While other metrics, such as accuracy and precision, are often used to evaluate 
 
 By focusing on recall, this project will help the NGO allocate its resources more effectively, reducing costs and time associated with well testing, and ultimately supporting improved public health and quality of life in Tanzania.
 
-# Data Understanding
+## Data Understanding
 This data was collected by Taarifa and the Tanzanian Ministry of Water. The dataset includes 41 features and 59400 entries. 
 
 Each entry in the dataset represents a water well in Tanzania, where `id` is its unique identifier. Additional information is included about each well such as the `latitude` and `longitude`, along with its water source --`source_type`-- and its total static head --`amount_tsh`-- (in other words the amount of water available to waterpoint). 
@@ -36,7 +38,7 @@ The target in this classification problem is stored in the column labeled `statu
 
 More information about the data can be found [here]( https://www.drivendata.org/competitions/7/pump-it-up-data-mining-the-water-table/data/).
 
-## Data Preparation
+### Data Preparation
 Based on my observations in the Data Understanding phase, I completed the following steps during the data preparation phase to clean and prepare the dataset for modeling:
 
 
@@ -84,7 +86,7 @@ The following are findings from the EDA portion of this project:
 
 These insights provide a focused starting point for addressing regions with the greatest need for well repairs and functionality improvement.
 
-# Modeling
+## Modeling
 In the Modeling phase, my primary goal was to build and refine predictive models that classified wells needing repair and those that did not. To prevent data leakage and ensure that the model was trained on clean, unbiased data, I started by performing a train-test-split with an 80/20 ratio. This approach ensured that the model was trained on the majority of the data while withholding a portion for validation and testing to evaluate performance on unseen data.
 
 
@@ -94,7 +96,7 @@ The data was preprocessed through one-hot encoding for categorical features and 
 For the baseline, I began with a logistic regression model, which served as a simple starting point for comparison. From there, I trained more complex models, such as decision trees and random forests, to improve recall scores. To address model overfitting and reduce complexity, I applied feature selection techniques like feature_importances_ and Recursive Feature Elimination (RFE). I also used hyperparameter tuning via GridSearchCV to optimize key model parameters and enhance predictive power. Further explanations for my choices and justifications for each of these steps are provided in more detail throughout the notebook.
 <img src= "https://github.com/ckucewicz/water_well_classification/blob/main/visualizations/RandomForestClassifier_confusion_matrix.png" width="800" height="500">
 
-# Evaluation
+## Evaluation
 This table below presents a comparison of the recall metrics and false negative percentages for different models, with conditional formatting to highlight the best and worst performance. The shading of the cells follows a color gradient where darker shades of blue indicate better values. The values for the “Difference (Training - Test/Val Recall) (%)” column are used to assess overfitting, where higher values indicate greater overfitting, as the model performs well on training data but poorly on test/validation data.
 
 The Decision Tree with RFE and Initial Random Forest models show a large discrepancy between their training and validation/test recall values, indicating overfitting. Although these models exhibit high training recall scores (close to 100%), their test/validation recall values are much lower, suggesting that they may not generalize well to unseen data.
@@ -106,7 +108,7 @@ Overall, the Baseline Logistic Regression model appears to be the most balanced,
 
 <img src= "https://github.com/ckucewicz/water_well_classification/blob/main/visualizations/model_metrics_table.png" width="1000" height="300">
 
-# Conclusion
+## Conclusion
 
 This evaluation highlights the challenges of balancing overfitting with predictive performance. While the initial random forest model achieved the highest recall, its significant overfitting limits its reliability on unseen data. In contrast, the tuned models showed reduced overfitting but at the cost of recall performance, suggesting a loss of signal during feature selection and hyperparameter tuning.
 
@@ -114,7 +116,7 @@ Given the objective of minimizing false negatives in well repair identification,
 
 This project demonstrates the importance of clean data and robust feature engineering to create models that are both accurate and generalizable. Future iterations should focus on refining data preprocessing and exploring additional algorithms that may better capture the complexities of the problem.
 
-## Limitations
+### Limitations
 - **Data Quality**:
 The dataset required extensive cleaning, including handling missing values, duplicate features, and irrelevant features. Decisions made during preprocessing, such as which features to retain or remove, may have inadvertently affected model performance. Cleaner data could improve the signal-to-noise ratio and lead to more effective models.
 
@@ -126,7 +128,7 @@ Time limitations restricted the depth of exploratory data analysis and model opt
 
 - **Domain Knowledge**:
 A lack of extensive domain knowledge about Tanzania and its water well infrastructure posed challenges during feature selection. Collaborating with local experts or incorporating region-specific insights into the analysis could improve the relevance and accuracy of the models, ensuring that they align more closely with the realities of the county.
-## Recommendations
+### Recommendations
 1. **Prioritize Wells in High-Demand Areas**:
     - Target the Northwest (Kigoma and areas between Kigoma and Sumbawanga) and Southeast (specifically around Dar Es Salaam and Mtwara) for initial focus.
     
@@ -143,7 +145,8 @@ A lack of extensive domain knowledge about Tanzania and its water well infrastru
     - Both the decision tree and random forest models demonstrated high recall on unseen data but suffered from overfitting, meaning their performance dropped significantly when tested on new data.
     
     - If the NGO wishes to leverage these models for well status prediction, it is crucial to mitigate overfitting by improving feature selection, adjusting model hyperparameters, or employing cross-validation techniques. Reducing overfitting will ensure that the models generalize better and provide more reliable predictions in real-world settings.
-## Next Steps
+
+### Next Steps
 1. **Enhance Data Collection and Sources**:
     - Invest in better data quality by ensuring more accurate, complete, and up-to-date information. This may involve collaborating with local agencies or using additional data sources to fill in gaps or reduce biases.
     - Improving data collection processes, such as regular updates and standardized reporting methods, can increase the reliability of models and lead to more effective decision-making.
@@ -164,7 +167,7 @@ View the [presentation](https://github.com/ckucewicz/water_well_classification/b
 
 Contact Chris Kucewicz at [cfkucewicz@gmail.com](cfkucewicz@gmail.com) with additional questions.
 
-## Repository Structure
+### Repository Structure
 ```
 ├── deliverables                           
     ├── water_well_classification_presentation.pdf       # non-technical presentation slideshow
