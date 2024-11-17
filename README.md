@@ -129,25 +129,24 @@ A lack of extensive domain knowledge about Tanzania and its water well infrastru
     - Investigate other algorithms such as Gradient Boosting or Support Vector Machines (SVM), which may offer improved performance, especially for balancing recall and generalization.
 
 # Additional Information
-View the full analysis in the [Jupyter Notebook](https://github.com/ckucewicz/water_well_classification).
+View the full project in the [Jupyter Notebook](https://github.com/ckucewicz/water_well_classification).
 
-View the [presentation](https://github.com/ckucewicz/water_well_classification)
+View the [presentation](https://github.com/ckucewicz/water_well_classification/blob/main/deliverables/water_well_presentation.pdf)
 
 Contact Chris Kucewicz at [cfkucewicz@gmail.com](cfkucewicz@gmail.com) with additional questions.
 
 ## Repository Structure
 ```
-├── Visualizations                            
-    ├── ...                                   # Visualizations from analysis
-├── Models                            
-    ├── ...                                   # Saved trained models
-├── presentationDeliverables
+├── deliverables                           
     ├── water_well_classification_presentation.pdf       # non-technical presentation slideshow
-    ├── Jupyter Notebook                      # pdf version of notebook used for analysis
+    ├── Jupyter Notebook                                 # pdf version of notebook used for analysis
     └── ckucewicz_water_well_classification_github.pdf   # pdf version of github repo
-├── zippedData                               
-    ├── ...                                   # data in zipped format
+├── trained_models                            
+    ├── ...                                              # Saved trained models
+├── visualizations                            
+    ├── ...                                              # Visualizations from analysis
+├── .gitattributes
 ├── .gitignore
+├── miscellaneous_notebook.ipynb
 ├── Notebook.ipynb
 ├── README.md
-├── miscellaneous_notebook.ipynb
