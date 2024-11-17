@@ -30,6 +30,8 @@ This data was collected by Taarifa and the Tanzanian Ministry of Water. The data
 
 Each entry in the dataset represents a water well in Tanzania, where `id` is its unique identifier. Additional information is included about each well such as the `latitude` and `longitude`, along with its water source --`source_type`-- and its total static head --`amount_tsh`-- (in other words the amount of water available to waterpoint). 
 
+<img src= "https://github.com/ckucewicz/water_well_classification/blob/main/visualizations/ternary_class_distribution_barplot.png" width="625" height="500">
+
 The target in this classification problem is stored in the column labeled `status_group`. Prior to any cleaning and preprocessing, this column includes three classes: functional, functional needs repair, and non-functional.
 
 More information about the data can be found [here]( https://www.drivendata.org/competitions/7/pump-it-up-data-mining-the-water-table/data/).
@@ -52,12 +54,35 @@ Based on my observations in the Data Understanding phase, I completed the follow
 
 4. **Reclassifying the Target Variable**: 
 - The original target variable was first reclassified from three classes into two classes, and then converted into a binary Boolean target. This was done to simplify modeling and ensure consistent interpretation of well functionality, aligning with the project’s objectives.
+<img src= "https://github.com/ckucewicz/water_well_classification/blob/main/visualizations/binary_class_distribution_barplot.png" width="625" height="500">
 
 
 5. **Feature Engineering and Selection**: 
 - For the `management` vs. `management_group` vs. `scheme_management` and `region` vs. `district_code` features, I trained simple decision trees using each set of features individually. By examining the feature_importances_ attribute, I identified the most significant variable from each group. The top feature from each pair was then selected and retained for further modeling.
 
+<img src= "https://github.com/ckucewicz/water_well_classification/blob/main/visualizations/feature_importances.png" width="800" height="500">
+
 By the end of the data cleaning process, the dataframe was reduced to 19 columns, down from 40, and 47,000 rows, down from nearly 60,000, with all null values removed. Despite the reduction of over 10,000 entries, 47,000 rows still provides plenty of data for training the models, even after performing the train-test split.
+# Exploratory Data Analysis
+The following are findings from the EDA portion of this project: 
+
+
+- **Distribution of Numeric Features**: The numeric features such as `population`, `amount_tsh`, and `gps_height` are not normally distributed and appear to be relatively right-skewed. This skewness can affect model performance by making certain features disproportionately influential. To address this, I applied the `MinMaxScaler()` during preprocessing. The scaler normalizes the data to a range between [0, 1], helping to mitigate the impact of outliers and ensuring that all features contribute equally to the model, which is particularly important for algorithms sensitive to feature magnitudes.
+
+
+- **Installer Influence**: Wells installed by `government`, `finnish_govt`, and `rwe` had a higher proportion of nonfunctioning wells compared to functional wells, indicating a potential correlation between installer type and well functionality.
+
+
+- **Water Basins Impact**: Wells located within the `Ruvuma / Southern Coast` and `Lake Rukwa` basins showed a higher proportion of nonfunctioning wells relative to functioning ones.
+
+
+- **High-Priority Areas**: Four specific areas were identified as high priority for intervention, meeting all three of the following criteria:
+    - A high density of wells in need of repair
+    - A low density of nearby functional wells
+    - Relatively high population density
+<img src= "https://github.com/ckucewicz/water_well_classification/blob/main/visualizations/tanzania_density_maps.png" width="1100" height="400">
+
+These insights provide a focused starting point for addressing regions with the greatest need for well repairs and functionality improvement.
 
 # Modeling
 In the Modeling phase, my primary goal was to build and refine predictive models that classified wells needing repair and those that did not. To prevent data leakage and ensure that the model was trained on clean, unbiased data, I started by performing a train-test-split with an 80/20 ratio. This approach ensured that the model was trained on the majority of the data while withholding a portion for validation and testing to evaluate performance on unseen data.
@@ -67,6 +92,7 @@ The data was preprocessed through one-hot encoding for categorical features and 
 
 
 For the baseline, I began with a logistic regression model, which served as a simple starting point for comparison. From there, I trained more complex models, such as decision trees and random forests, to improve recall scores. To address model overfitting and reduce complexity, I applied feature selection techniques like feature_importances_ and Recursive Feature Elimination (RFE). I also used hyperparameter tuning via GridSearchCV to optimize key model parameters and enhance predictive power. Further explanations for my choices and justifications for each of these steps are provided in more detail throughout the notebook.
+<img src= "https://github.com/ckucewicz/water_well_classification/blob/main/visualizations/RandomForestClassifier_confusion_matrix.png" width="800" height="500">
 
 # Evaluation
 This table below presents a comparison of the recall metrics and false negative percentages for different models, with conditional formatting to highlight the best and worst performance. The shading of the cells follows a color gradient where darker shades of blue indicate better values. The values for the “Difference (Training - Test/Val Recall) (%)” column are used to assess overfitting, where higher values indicate greater overfitting, as the model performs well on training data but poorly on test/validation data.
@@ -78,6 +104,8 @@ Final models like the Final Decision Tree and Final Random Forest showed improve
 
 Overall, the Baseline Logistic Regression model appears to be the most balanced, achieving reasonable recall with a low difference between training and test data performance. This model demonstrates a more reliable and generalized performance compared to the more overfit models, despite not achieving the highest recall value.
 
+<img src= "https://github.com/ckucewicz/water_well_classification/blob/main/visualizations/model_metrics_table.png" width="1000" height="300">
+
 # Conclusion
 
 This evaluation highlights the challenges of balancing overfitting with predictive performance. While the initial random forest model achieved the highest recall, its significant overfitting limits its reliability on unseen data. In contrast, the tuned models showed reduced overfitting but at the cost of recall performance, suggesting a loss of signal during feature selection and hyperparameter tuning.
@@ -85,6 +113,7 @@ This evaluation highlights the challenges of balancing overfitting with predicti
 Given the objective of minimizing false negatives in well repair identification, the initial random forest model appears most promising, despite its overfitting. However, if generalizability is a higher priority, the tuned models offer a more balanced alternative.
 
 This project demonstrates the importance of clean data and robust feature engineering to create models that are both accurate and generalizable. Future iterations should focus on refining data preprocessing and exploring additional algorithms that may better capture the complexities of the problem.
+
 ## Limitations
 - **Data Quality**:
 The dataset required extensive cleaning, including handling missing values, duplicate features, and irrelevant features. Decisions made during preprocessing, such as which features to retain or remove, may have inadvertently affected model performance. Cleaner data could improve the signal-to-noise ratio and lead to more effective models.
