@@ -127,4 +127,27 @@ A lack of extensive domain knowledge about Tanzania and its water well infrastru
 
 3. **Explore Advanced Modeling Techniques**:
     - Investigate other algorithms such as Gradient Boosting or Support Vector Machines (SVM), which may offer improved performance, especially for balancing recall and generalization.
+
 # Additional Information
+View the full analysis in the [Jupyter Notebook](https://github.com/ckucewicz/water_well_classification).
+
+View the [presentation](https://github.com/ckucewicz/water_well_classification)
+
+Contact Chris Kucewicz at [cfkucewicz@gmail.com](cfkucewicz@gmail.com) with additional questions.
+
+## Repository Structure
+```
+├── Visualizations                            
+    ├── ...                                   # Visualizations from analysis
+├── Models                            
+    ├── ...                                   # Saved trained models
+├── presentationDeliverables
+    ├── water_well_classification_presentation.pdf       # non-technical presentation slideshow
+    ├── Jupyter Notebook                      # pdf version of notebook used for analysis
+    └── ckucewicz_water_well_classification_github.pdf   # pdf version of github repo
+├── zippedData                               
+    ├── ...                                   # data in zipped format
+├── .gitignore
+├── Notebook.ipynb
+├── README.md
+├── miscellaneous_notebook.ipynb
