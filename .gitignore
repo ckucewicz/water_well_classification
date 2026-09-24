@@ -4,3 +4,5 @@
 # Junk Files
 .DS_Store
 .ipynb_checkpoints
+trained_models/best_rfe_rforest_model.sav
+trained_models/gs_forest_model.sav
