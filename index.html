@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tanzania Water Well Classification | Chris Kucewicz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brown:      #6b4226;
+    --tan:        #c9a87c;
+    --tan-light:  #f0e6d3;
+    --green:      #3a5a40;
+    --green-light:#d4e6d4;
+    --white:      #ffffff;
+    --off-white:  #faf7f2;
+    --text:       #1a1a1a;
+    --muted:      #666;
+    --shadow:     0 4px 24px rgba(0,0,0,0.10);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    color: var(--text);
+    background: var(--off-white);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    height: 56px;
+    background: var(--brown);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .nav-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    color: var(--white);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--brown);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 40px 60px;
+  }
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--tan);
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 60px);
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.1;
+    max-width: 760px;
+    margin-bottom: 24px;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--tan);
+  }
+  .hero p {
+    font-size: 16px;
+    color: rgba(255,255,255,0.65);
+    max-width: 560px;
+    line-height: 1.75;
+    margin-bottom: 40px;
+  }
+  .hero-meta {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 48px;
+  }
+  .hero-meta-item {
+    text-align: center;
+  }
+  .hero-meta-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1;
+  }
+  .hero-meta-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+  .hero-divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255,255,255,0.2);
+    align-self: center;
+  }
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--tan); color: var(--brown); }
+  .btn-primary:hover { background: #d4b48a; }
+  .btn-secondary { background: transparent; color: var(--white); border: 1.5px solid rgba(255,255,255,0.4); }
+  .btn-secondary:hover { border-color: var(--white); }
+
+  /* ── SCROLL HINT ── */
+  .scroll-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.35);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.35), transparent);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.35; transform: scaleY(1); }
+    50% { opacity: 0.8; transform: scaleY(1.2); }
+  }
+
+  /* ── CONTENT SECTIONS ── */
+  .section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 80px 40px;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--tan);
+    margin-bottom: 12px;
+  }
+  .section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(24px, 3vw, 36px);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+  .section-divider {
+    width: 40px;
+    height: 3px;
+    background: var(--tan);
+    margin-bottom: 28px;
+  }
+  .section p {
+    font-size: 15px;
+    line-height: 1.8;
+    color: #444;
+    margin-bottom: 16px;
+    max-width: 720px;
+  }
+  .section p:last-child { margin-bottom: 0; }
+
+  /* alternating section backgrounds */
+  .section-alt {
+    background: var(--white);
+  }
+  .section-alt .section {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .section-dark {
+    background: var(--brown);
+  }
+  .section-dark .section-label { color: var(--tan); }
+  .section-dark h2 { color: var(--white); }
+  .section-dark .section-divider { background: var(--tan); }
+  .section-dark p { color: rgba(255,255,255,0.75); }
+
+  /* ── STAT GRID ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin: 32px 0;
+  }
+  .stat-card {
+    background: var(--off-white);
+    border-radius: 3px;
+    padding: 20px 24px;
+    border-left: 3px solid var(--tan);
+  }
+  .section-dark .stat-card {
+    background: rgba(255,255,255,0.08);
+    border-left-color: var(--tan);
+  }
+  .stat-card-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--brown);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .section-dark .stat-card-num { color: var(--tan); }
+  .stat-card-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .section-dark .stat-card-label { color: rgba(255,255,255,0.5); }
+
+  /* ── TWO COLUMN LAYOUT ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+    margin-top: 32px;
+  }
+  @media (max-width: 680px) {
+    .two-col { grid-template-columns: 1fr; }
+  }
+
+  /* ── MAPS ── */
+  .map-section {
+    background: var(--off-white);
+    padding: 80px 0;
+  }
+  .map-section .section {
+    max-width: 1100px;
+    padding: 0 40px;
+  }
+  .map-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 40px;
+  }
+  @media (max-width: 780px) {
+    .map-grid { grid-template-columns: 1fr; }
+  }
+  .map-card {
+    background: var(--white);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .map-card.full-width {
+    grid-column: 1 / -1;
+  }
+  .map-frame {
+    width: 100%;
+    height: 380px;
+    border: none;
+    pointer-events: none;
+    display: block;
+  }
+  .map-frame-tall {
+    height: 460px;
+  }
+  .map-card-body {
+    padding: 20px 24px;
+  }
+  .map-card-body h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .map-card-body p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin: 0;
+  }
+  .map-unlock-btn {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--brown);
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ── VIZ IMAGES ── */
+  .viz-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 32px;
+  }
+  @media (max-width: 680px) {
+    .viz-grid { grid-template-columns: 1fr; }
+  }
+  .viz-card {
+    background: var(--white);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .viz-card img {
+    width: 100%;
+    display: block;
+  }
+  .viz-card-body {
+    padding: 16px 20px;
+  }
+  .viz-card-body h3 {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .viz-card-body p {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* ── MODEL METRICS ── */
+  .metrics-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 24px;
+    font-size: 14px;
+  }
+  .metrics-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 2px solid var(--tan-light);
+  }
+  .metrics-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--tan-light);
+    color: #333;
+  }
+  .metrics-table tr.best-model td {
+    font-weight: 500;
+    background: var(--green-light);
+  }
+  .metrics-table tr.best-model td:first-child {
+    border-left: 3px solid var(--green);
+  }
+
+  /* ── RECOMMENDATIONS ── */
+  .rec-list {
+    list-style: none;
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .rec-item {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .rec-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--tan);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 32px;
+  }
+  .rec-content h3 {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--white);
+  }
+  .rec-content p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* ── FINDINGS ── */
+  .finding-list {
+    list-style: none;
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .finding-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #444;
+  }
+  .finding-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--tan);
+    flex-shrink: 0;
+    margin-top: 7px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #2c1a0e;
+    padding: 40px;
+    text-align: center;
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+  }
+  footer a { color: var(--tan); text-decoration: none; }
+  footer a:hover { color: var(--white); }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar {
+    position: fixed;
+    top: 56px; left: 0;
+    height: 2px;
+    background: var(--tan);
+    z-index: 1001;
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="#">Tanzania Water Wells</a>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#data">Data</a></li>
+    <li><a href="#maps">Maps</a></li>
+    <li><a href="#model">Model</a></li>
+    <li><a href="https://github.com/ckucewicz/water_well_classification" target="_blank">GitHub</a></li>
+  </ul>
+</nav>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Machine Learning / Public Health</div>
+  <h1>Which Wells in <em>Tanzania</em> Need Repair?</h1>
+  <p>A classification model built to help field organizations prioritize water well repairs across Tanzania's 21 regions, where nearly half of all wells are non-functional or failing.</p>
+  <div class="hero-meta">
+    <div class="hero-meta-item">
+      <div class="hero-meta-num">59K</div>
+      <div class="hero-meta-label">Wells in dataset</div>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-meta-item">
+      <div class="hero-meta-num">46%</div>
+      <div class="hero-meta-label">Need repair</div>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-meta-item">
+      <div class="hero-meta-num">77.8%</div>
+      <div class="hero-meta-label">Model recall</div>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-meta-item">
+      <div class="hero-meta-num">9.7%</div>
+      <div class="hero-meta-label">False negative rate</div>
+    </div>
+  </div>
+  <div class="btn-row" style="margin-bottom: 48px;">
+    <a href="https://github.com/ckucewicz/water_well_classification/blob/main/Notebook.ipynb" target="_blank" class="btn btn-primary">View Notebook</a>
+    <a href="https://github.com/ckucewicz/water_well_classification" target="_blank" class="btn btn-secondary">GitHub Repo</a>
+  </div>
+  <div class="scroll-hint">
+    <span>Scroll to explore</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="section-alt" id="problem">
+  <div class="section">
+    <div class="section-label">01 / The Problem</div>
+    <h2>Tanzania Has a Water Access Crisis</h2>
+    <div class="section-divider"></div>
+    <p>Tanzania is home to more than 67 million people, and access to clean water remains one of the country's most pressing public health challenges. Across the country, tens of thousands of wells provide water for drinking, cooking, and sanitation, but a significant portion are broken or failing.</p>
+    <p>Testing every well individually is expensive and slow. Field organizations need a smarter way to triage: which wells should they visit first? This project builds a classification model to answer that question, using well characteristics available in existing records to predict which ones need repair.</p>
+    <p>The cost of getting it wrong is not symmetrical. Missing a broken well (a false negative) means a community goes without clean water. That asymmetry shapes every modeling decision in this project, starting with the choice of evaluation metric.</p>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-card-num">67M+</div>
+        <div class="stat-card-label">Tanzanians served by wells</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num">59K</div>
+        <div class="stat-card-label">Wells in dataset</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num">46%</div>
+        <div class="stat-card-label">Need repair</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num">21</div>
+        <div class="stat-card-label">Regions covered</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DATA -->
+<section id="data">
+  <div class="section">
+    <div class="section-label">02 / The Data</div>
+    <h2>59,400 Wells, 41 Features</h2>
+    <div class="section-divider"></div>
+    <p>The dataset comes from Taarifa and the Tanzanian Ministry of Water, collected as part of the DrivenData Pump It Up competition. Each row represents one well, with information about its location, water source, installer, construction year, management structure, and current status.</p>
+    <div class="two-col">
+      <div>
+        <p>The target variable, <strong>status_group</strong>, originally has three classes: functional, functional needs repair, and non-functional. For this project, the three classes were collapsed into a binary target: needs repair vs. does not need repair. This simplification focuses the model on the decision that actually matters in the field.</p>
+        <p>After cleaning (dropping redundant features, handling nulls, and reducing cardinality on high-dimensionality columns like installer), the dataset was trimmed to 19 features and roughly 47,000 records.</p>
+      </div>
+      <div>
+        <ul class="finding-list">
+          <li class="finding-item"><div class="finding-dot"></div>Wells installed by government entities and certain foreign contractors show higher non-functional rates</li>
+          <li class="finding-item"><div class="finding-dot"></div>The Ruvuma/Southern Coast and Lake Rukwa basins have disproportionately high failure rates</li>
+          <li class="finding-item"><div class="finding-dot"></div>Numeric features like population and GPS height are right-skewed, so MinMaxScaler was applied during preprocessing</li>
+          <li class="finding-item"><div class="finding-dot"></div>The installer column had 2,145 unique values, reduced to 26 categories by grouping low-frequency entries</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAPS -->
+<section class="map-section" id="maps">
+  <div class="section">
+    <div class="section-label">03 / Spatial Analysis</div>
+    <h2>Where Are the Wells, and Which Ones Are Failing?</h2>
+    <div class="section-divider"></div>
+    <p>The dataset includes GPS coordinates for nearly all wells, making spatial analysis a natural part of understanding the problem. The maps below show well status across the country, repair rates by region, and the four areas identified as highest priority for intervention.</p>
+    <p style="font-size:12px; color:var(--muted); margin-top:8px;">Click any map to interact — zoom, pan, and hover for details.</p>
+
+    <div class="map-grid">
+      <!-- Map 1: Well status -->
+      <div class="map-card">
+        <iframe class="map-frame" src="docs/maps/well_status_map.html"
+          title="Well status map" id="map1" loading="lazy"></iframe>
+        <div class="map-card-body">
+          <h3>Well Status by Location</h3>
+          <p>Each point is a well, colored by status. Toggle layers to show or hide each group. Teal = functional, orange = needs repair, rose = non-functional.</p>
+          <button class="map-unlock-btn" onclick="unlockMap('map1')">Click to interact</button>
+        </div>
+      </div>
+
+      <!-- Map 2: Choropleth -->
+      <div class="map-card">
+        <iframe class="map-frame" src="docs/maps/repair_rate_choropleth.html"
+          title="Repair rate choropleth" id="map2" loading="lazy"></iframe>
+        <div class="map-card-body">
+          <h3>Repair Rate by Region</h3>
+          <p>Proportion of wells needing repair in each of Tanzania's 21 regions. Darker shading indicates a higher share of failing wells. Hover for exact rates.</p>
+          <button class="map-unlock-btn" onclick="unlockMap('map2')">Click to interact</button>
+        </div>
+      </div>
+
+      <!-- Map 3: High priority -->
+      <div class="map-card full-width">
+        <iframe class="map-frame map-frame-tall" src="docs/maps/high_priority_map.html"
+          title="High priority areas" id="map3" loading="lazy"></iframe>
+        <div class="map-card-body">
+          <h3>High Priority Repair Areas</h3>
+          <p>Heatmap of non-functional wells only. The four outlined regions (Kigoma, Mtwara, Lindi, and Dar es Salaam) meet all three high-priority criteria: high density of broken wells, low nearby functional well access, and high population. These are the recommended starting points for field intervention.</p>
+          <button class="map-unlock-btn" onclick="unlockMap('map3')">Click to interact</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODEL -->
+<section class="section-alt" id="model">
+  <div class="section">
+    <div class="section-label">04 / The Model</div>
+    <h2>Why Recall, and Which Model Won</h2>
+    <div class="section-divider"></div>
+    <p>Standard accuracy is a poor metric here. A model that predicted every well as functional would still hit roughly 54% accuracy — without ever flagging a single well for repair. The metric that matters is <strong>recall</strong>: out of all the wells that actually need repair, what share did the model catch?</p>
+    <p>Four model types were trained and compared: logistic regression as a baseline, then decision tree and random forest classifiers with progressively more tuning. Feature selection via recursive feature elimination and hyperparameter tuning via GridSearchCV were applied to reduce overfitting.</p>
+
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Recall</th>
+          <th>False Negative Rate</th>
+          <th>Overfit Gap</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Baseline Logistic Regression</td>
+          <td>71.2%</td>
+          <td>28.8%</td>
+          <td>Low</td>
+        </tr>
+        <tr>
+          <td>Decision Tree (tuned)</td>
+          <td>68.4%</td>
+          <td>31.6%</td>
+          <td>Moderate</td>
+        </tr>
+        <tr class="best-model">
+          <td>Random Forest (initial)</td>
+          <td>77.8%</td>
+          <td>9.7%</td>
+          <td>High</td>
+        </tr>
+        <tr>
+          <td>Random Forest (tuned)</td>
+          <td>72.1%</td>
+          <td>27.9%</td>
+          <td>Moderate</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top: 20px;">The initial random forest achieved the best recall and the lowest false negative rate, despite showing signs of overfitting. A missed well means a community loses water access, so the false negative rate took priority over generalization. The tuned models reduced overfitting but at a meaningful cost to recall.</p>
+
+    <div class="viz-grid" style="margin-top: 32px;">
+      <div class="viz-card">
+        <img src="visualizations/RandomForestClassifier_confusion_matrix.png" alt="Random Forest confusion matrix">
+        <div class="viz-card-body">
+          <h3>Random Forest Confusion Matrix</h3>
+          <p>True positives and false negatives for the best-performing model on held-out test data.</p>
+        </div>
+      </div>
+      <div class="viz-card">
+        <img src="visualizations/feature_importances.png" alt="Feature importances">
+        <div class="viz-card-body">
+          <h3>Feature Importances</h3>
+          <p>Features ranked by their contribution to the model's predictions. GPS height, quantity, and waterpoint type are the strongest signals.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RECOMMENDATIONS -->
+<section class="section-dark" id="recommendations">
+  <div class="section">
+    <div class="section-label">05 / Recommendations</div>
+    <h2>Where to Focus and What to Do Next</h2>
+    <div class="section-divider"></div>
+    <ul class="rec-list">
+      <li class="rec-item">
+        <div class="rec-num">1</div>
+        <div class="rec-content">
+          <h3>Start in Kigoma and the Southeast</h3>
+          <p>The spatial analysis points to Kigoma in the northwest and Mtwara and Lindi in the southeast as the highest-need areas. These regions combine high well failure rates, large populations, and limited access to nearby functional wells. Field teams should prioritize these for the first wave of inspections.</p>
+        </div>
+      </li>
+      <li class="rec-item">
+        <div class="rec-num">2</div>
+        <div class="rec-content">
+          <h3>Deploy the initial random forest for triage</h3>
+          <p>Despite overfitting on training data, the initial random forest keeps the false negative rate at 9.7%, the lowest of any model tested. Deploying it now provides a practical starting point for prioritizing well visits while refinements continue in parallel.</p>
+        </div>
+      </li>
+      <li class="rec-item">
+        <div class="rec-num">3</div>
+        <div class="rec-content">
+          <h3>Invest in better data collection</h3>
+          <p>Several potentially useful features — installer, scheme management, and construction year had significant data quality issues. More accurate and complete records would improve model performance and reduce the need for heavy preprocessing decisions that may be losing signal.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- NEXT STEPS -->
+<section>
+  <div class="section">
+    <div class="section-label">06 / Next Steps</div>
+    <h2>Where This Project Goes From Here</h2>
+    <div class="section-divider"></div>
+    <ul class="finding-list">
+      <li class="finding-item"><div class="finding-dot"></div>Explore gradient boosting methods (XGBoost, LightGBM) which may better balance recall and generalization than random forests</li>
+      <li class="finding-item"><div class="finding-dot"></div>Run broader hyperparameter searches with more compute — the GridSearchCV grids were constrained by time and memory</li>
+      <li class="finding-item"><div class="finding-dot"></div>Incorporate spatial features directly into the model — distance to nearest functional well and regional repair rate as engineered predictors</li>
+      <li class="finding-item"><div class="finding-dot"></div>Partner with local agencies to validate predictions against ground-truth well inspections and refine the model with updated data</li>
+    </ul>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p style="margin-bottom: 8px;">
+    By <a href="https://www.linkedin.com/in/chriskucewicz/">Chris Kucewicz</a>
+    &nbsp;·&nbsp;
+    <a href="mailto:cfkucewicz@gmail.com">cfkucewicz@gmail.com</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/ckucewicz/water_well_classification">GitHub</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/ckucewicz/water_well_classification/blob/main/presentation.pdf">Presentation</a>
+  </p>
+  <p>Data: Taarifa / Tanzanian Ministry of Water via DrivenData</p>
+</footer>
+
+<script>
+// Progress bar
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  document.getElementById('progressBar').style.width = (scrollTop / docHeight * 100) + '%';
+}, { passive: true });
+
+// Map unlock on click
+function unlockMap(id) {
+  const frame = document.getElementById(id);
+  frame.style.pointerEvents = 'auto';
+  frame.parentElement.nextElementSibling.querySelector('.map-unlock-btn').style.display = 'none';
+}
+
+// Re-lock maps on scroll
+window.addEventListener('scroll', () => {
+  document.querySelectorAll('.map-frame').forEach(f => {
+    f.style.pointerEvents = 'none';
+  });
+  document.querySelectorAll('.map-unlock-btn').forEach(b => {
+    b.style.display = 'inline-block';
+  });
+}, { passive: true });
+</script>
+</body>
+</html>
