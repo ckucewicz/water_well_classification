@@ -97,37 +97,42 @@ For the baseline, I began with a logistic regression model, which served as a si
 <img src= "https://github.com/ckucewicz/water_well_classification/blob/main/visualizations/RandomForestClassifier_confusion_matrix.png" width="800" height="500">
 
 ## Evaluation
-This table below presents a comparison of the recall metrics and false negative percentages for different models, with conditional formatting to highlight the best and worst performance. The shading of the cells follows a color gradient where darker shades of blue indicate better values. The values for the “Difference (Training - Test/Val Recall) (%)” column are used to assess overfitting, where higher values indicate greater overfitting, as the model performs well on training data but poorly on test/validation data.
+This table presents a comparison of the recall metrics and false negative percentages for different models, with conditional formatting to highlight the best and worst performance. The shading of the cells follows a color gradient where darker shades of blue indicate better values. The values for the “Difference (Training - Test/Val Recall) (%)” column are used to assess overfitting, where higher values indicate greater overfitting, as the model performs well on training data but poorly on test/validation data.
 
-The Decision Tree with RFE and Initial Random Forest models show a large discrepancy between their training and validation/test recall values, indicating overfitting. Although these models exhibit high training recall scores (close to 100%), their test/validation recall values are much lower, suggesting that they may not generalize well to unseen data.
-In contrast, the Baseline Logistic Regression model, while showing lower recall scores compared to the initial random forest model, demonstrates a more balanced performance with a smaller difference between training and testing recall. This suggests that the model generalizes better, making it more reliable in real-world applications, despite its lower recall.
+* The ***Initial Random Forest (test data)*** model emerged as the best performer in terms of minimizing false negatives, which was the primary objective of this project. Despite overfitting on the training data, this model achieved a relatively low false negative percentage (9.7%) and had a high recall on the test data (77.78%). This trade-off was acceptable as the project’s goal was to minimize missed wells that require repair, which directly impacts public health and safety.
 
-Final models like the Final Decision Tree and Final Random Forest showed improvements in reducing overfitting but suffered from a significant decrease in recall, particularly on the test data, which aligns with the overfitting mitigation efforts undertaken through feature selection and hyperparameter tuning.
+* The ***Final Decision Tree*** and ***Final Random Forest*** models, while showing some improvement in overfitting reduction through feature selection and hyperparameter tuning, experienced a significant drop in recall, particularly on test data. This suggests that, although these models are less prone to overfitting, their ability to identify wells needing repair was compromised.
 
-Overall, the Baseline Logistic Regression model appears to be the most balanced, achieving reasonable recall with a low difference between training and test data performance. This model demonstrates a more reliable and generalized performance compared to the more overfit models, despite not achieving the highest recall value.
+* In contrast, the ***Baseline Logistic Regression*** model, while showing lower recall scores compared to the initial random forest model, demonstrates a more balanced performance with a smaller difference between training and testing recall. This suggests that the model generalizes better 
 
-<img src= "https://github.com/ckucewicz/water_well_classification/blob/main/visualizations/model_metrics_table.png" width="1000" height="300">
+Overall, the ***Initial Random Forest*** model proved to be the most effective in minimizing false negatives, aligning with the safety-first goals of the project, despite the challenge of overfitting. The ***Baseline Logistic Regression*** provided more balanced results but was not as effective at reducing false negatives.
+
+<img src= "https://github.com/ckucewicz/water_well_classification/blob/main/visualizations/model_metrics_table_updated.png" width="1100" height="280">
 
 ## Conclusion
 
-This evaluation highlights the challenges of balancing overfitting with predictive performance. While the initial random forest model achieved the highest recall, its significant overfitting limits its reliability on unseen data. In contrast, the tuned models showed reduced overfitting but at the cost of recall performance, suggesting a loss of signal during feature selection and hyperparameter tuning.
+This evaluation highlights the challenges of balancing overfitting with predictive performance. While the ***initial random forest*** model achieved the highest recall, its significant overfitting limits its reliability on unseen data. In contrast, the tuned models showed reduced overfitting but at the cost of recall performance, suggesting a loss of signal during feature selection and hyperparameter tuning.
 
-Given the objective of minimizing false negatives in well repair identification, the initial random forest model appears most promising, despite its overfitting. However, if generalizability is a higher priority, the tuned models offer a more balanced alternative.
+Given the objective of minimizing false negatives in well repair identification, the ***initial random forest*** model appears most promising, despite its overfitting.
 
 This project demonstrates the importance of clean data and robust feature engineering to create models that are both accurate and generalizable. Future iterations should focus on refining data preprocessing and exploring additional algorithms that may better capture the complexities of the problem.
 
 ### Limitations
 - **Data Quality**:
-The dataset required extensive cleaning, including handling missing values, duplicate features, and irrelevant features. Decisions made during preprocessing, such as which features to retain or remove, may have inadvertently affected model performance. Cleaner data could improve the signal-to-noise ratio and lead to more effective models.
+The model’s performance is heavily influenced by the quality of the data. During the data cleaning and preprocessing stages, several decisions were made that could have affected the model’s predictive accuracy. For example, I dropped features with high null values, which may have removed useful information from the dataset. I also chose to use the MinMaxScaler to scale the numeric data because the numeric columns did not appear to be normally distributed. While this choice helped address the non-normality, other scaling methods, such as StandardScaler, might have performed better in some cases. These decisions, although intended to improve model training and reduce noise, may have impacted the model’s performance. A more refined approach to feature selection, handling missing values, and experimenting with different scaling methods could lead to a better signal-to-noise ratio and, ultimately, more effective models.
+
 
 - **Computing Constraints**:
 Complex models like random forests and hyperparameter tuning processes such as GridSearchCV are computationally expensive. Limited resources restricted the breadth of parameter grids explored, potentially impacting the optimality of the models.
 
+
 - **Time Constraints**:
 Time limitations restricted the depth of exploratory data analysis and model optimization. With additional time, a wider array of feature selection strategies could have been explored, and larger parameter grids for hyperparameter tuning could have been tested. This might have resulted in better-performing models with improved recall and generalizability.
 
+
 - **Domain Knowledge**:
-A lack of extensive domain knowledge about Tanzania and its water well infrastructure posed challenges during feature selection. Collaborating with local experts or incorporating region-specific insights into the analysis could improve the relevance and accuracy of the models, ensuring that they align more closely with the realities of the county.
+A lack of extensive domain knowledge about Tanzania's geography and water infrastructure posed challenges during feature selection. Collaborating with local experts or incorporating region-specific insights into the analysis could improve the relevance and accuracy of the models, ensuring that they align more closely with the realities of the county.
+
 ### Recommendations
 1. **Prioritize Wells in High-Demand Areas**:
     - Target the Northwest (Kigoma and areas between Kigoma and Sumbawanga) and Southeast (specifically around Dar Es Salaam and Mtwara) for initial focus.
@@ -135,16 +140,18 @@ A lack of extensive domain knowledge about Tanzania and its water well infrastru
     - These regions have high population densities, significant numbers of wells in need of repair, and a low density of nearby functioning wells, as indicated by the KDE density maps. Prioritizing these areas will maximize the impact of well repairs by addressing both high demand and access issues.
 
 
-2.	**Use the Baseline Logistic Regression Model for Well Status Prediction**:
-    - While more complex models (e.g., decision trees and random forests) may show high recall on training data, the baseline logistic regression model demonstrates better generalizability on unseen data.
+2.	**Use the Initial Random Forest Model for Well Status Prediction**:
+    * Despite showing overfitting, the initial random forest model has the lowest false negative rate (9.7%), making it the best option for deployment given the project’s goal of reducing false negatives.
+      
+    * False negatives leave communities without access to water, so prioritizing this metric aligns with the urgent need to address the water crisis.
+  
+    * Deploying this model now provides a practical starting point, while refinements to address overfitting can continue in parallel.
+
+  
+3. **Improve Random Forest Model Performance**:
+    * To ensure long-term reliability, refine the random forest model by addressing overfitting through hyperparameter tuning, enhanced feature selection, and cross-validation.
     
-    - The logistic regression model provides a more reliable and balanced prediction performance, making it a more suitable choice for predicting well status across diverse regions and conditions.
-    
-    
-3. **Address Overfitting in Decision Tree and Random Forest Models**:
-    - Both the decision tree and random forest models demonstrated high recall on unseen data but suffered from overfitting, meaning their performance dropped significantly when tested on new data.
-    
-    - If the NGO wishes to leverage these models for well status prediction, it is crucial to mitigate overfitting by improving feature selection, adjusting model hyperparameters, or employing cross-validation techniques. Reducing overfitting will ensure that the models generalize better and provide more reliable predictions in real-world settings.
+    * These refinements will improve its ability to generalize and provide more accurate predictions on unseen data.
 
 ### Next Steps
 1. **Enhance Data Collection and Sources**:
@@ -152,9 +159,9 @@ A lack of extensive domain knowledge about Tanzania and its water well infrastru
     - Improving data collection processes, such as regular updates and standardized reporting methods, can increase the reliability of models and lead to more effective decision-making.
     
     
-2. **Address Overfitting in Random Forest and Decision Tree Models**:
+2. **Improve Performance Beyond Baseline**:
     - Allocate more time to refining the hyperparameters and performing more extensive cross-validation to reduce overfitting in the decision tree and random forest classifiers.
-    - Techniques such as pruning, ensemble methods, or adjusting the depth of trees could be explored to improve the models’ ability to generalize to new data.
+    - Techniques such as pruning, ensemble methods, or adjusting the depth of trees could be explored to improve the models’ ability to generalize to new data while also improving the recall score.
 
 
 3. **Explore Advanced Modeling Techniques**:
