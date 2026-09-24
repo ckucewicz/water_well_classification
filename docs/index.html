@@ -289,32 +289,62 @@
     padding: 0 40px;
   }
   .map-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
     margin-top: 40px;
-  }
-  @media (max-width: 780px) {
-    .map-grid { grid-template-columns: 1fr; }
   }
   .map-card {
     background: var(--white);
     border-radius: 4px;
     overflow: hidden;
     box-shadow: var(--shadow);
+    position: relative;
+  }
+  .map-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 480px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: rgba(0,0,0,0.0);
+    transition: background 0.2s;
+  }
+  .map-overlay:hover {
+    background: rgba(0,0,0,0.04);
+  }
+  .map-overlay-hint {
+    background: rgba(0,0,0,0.55);
+    color: white;
+    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 20px;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .map-card.unlocked .map-overlay {
+    display: none;
+  }
+  .map-card.unlocked .map-frame {
+    pointer-events: auto;
   }
   .map-card.full-width {
     grid-column: 1 / -1;
   }
   .map-frame {
     width: 100%;
-    height: 380px;
+    height: 480px;
     border: none;
     pointer-events: none;
     display: block;
-  }
-  .map-frame-tall {
-    height: 460px;
+    position: relative;
   }
   .map-card-body {
     padding: 20px 24px;
@@ -331,21 +361,7 @@
     line-height: 1.6;
     margin: 0;
   }
-  .map-unlock-btn {
-    display: inline-block;
-    margin-top: 10px;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--brown);
-    cursor: pointer;
-    border: none;
-    background: none;
-    padding: 0;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
+
 
   /* ── VIZ IMAGES ── */
   .viz-grid {
@@ -554,7 +570,7 @@
     <div class="section-divider"></div>
     <p>Tanzania is home to more than 67 million people, and access to clean water remains one of the country's most pressing public health challenges. Across the country, tens of thousands of wells provide water for drinking, cooking, and sanitation, but a significant portion are broken or failing.</p>
     <p>Testing every well individually is expensive and slow. Field organizations need a smarter way to triage: which wells should they visit first? This project builds a classification model to answer that question, using well characteristics available in existing records to predict which ones need repair.</p>
-    <p>The cost of getting it wrong is not symmetrical. Missing a broken well (a false negative) means a community goes without clean water. That asymmetry shapes every modeling decision in this project, starting with the choice of evaluation metric.</p>
+    <p>Missing a broken well (a false negative) means a community goes without clean water. That single consequence shapes every modeling decision in this project, starting with the choice of evaluation metric.</p>
     <div class="stat-grid">
       <div class="stat-card">
         <div class="stat-card-num">67M+</div>
@@ -607,12 +623,12 @@
     <h2>Where Are the Wells, and Which Ones Are Failing?</h2>
     <div class="section-divider"></div>
     <p>The dataset includes GPS coordinates for nearly all wells, making spatial analysis a natural part of understanding the problem. The maps below show well status across the country, repair rates by region, and the four areas identified as highest priority for intervention.</p>
-    <p style="font-size:12px; color:var(--muted); margin-top:8px;">Click any map to interact — zoom, pan, and hover for details.</p>
+    <p style="font-size:12px; color:var(--muted); margin-top:8px;">Click any map to interact. Zoom, pan, and hover for details.</p>
 
     <div class="map-grid">
       <!-- Map 1: Well status -->
       <div class="map-card">
-        <iframe class="map-frame" src="maps/well_status_map.html"
+        <iframe class="map-frame" src="docs/maps/well_status_map.html"
           title="Well status map" id="map1" loading="lazy"></iframe>
         <div class="map-card-body">
           <h3>Well Status by Location</h3>
@@ -623,7 +639,7 @@
 
       <!-- Map 2: Choropleth -->
       <div class="map-card">
-        <iframe class="map-frame" src="maps/repair_rate_choropleth.html"
+        <iframe class="map-frame" src="docs/maps/repair_rate_choropleth.html"
           title="Repair rate choropleth" id="map2" loading="lazy"></iframe>
         <div class="map-card-body">
           <h3>Repair Rate by Region</h3>
@@ -633,8 +649,8 @@
       </div>
 
       <!-- Map 3: High priority -->
-      <div class="map-card full-width">
-        <iframe class="map-frame map-frame-tall" src="maps/high_priority_map.html"
+      <div class="map-card">
+        <iframe class="map-frame" src="docs/maps/high_priority_map.html"
           title="High priority areas" id="map3" loading="lazy"></iframe>
         <div class="map-card-body">
           <h3>High Priority Repair Areas</h3>
@@ -652,7 +668,7 @@
     <div class="section-label">04 / The Model</div>
     <h2>Why Recall, and Which Model Won</h2>
     <div class="section-divider"></div>
-    <p>Standard accuracy is a poor metric here. A model that predicted every well as functional would still hit roughly 54% accuracy — without ever flagging a single well for repair. The metric that matters is <strong>recall</strong>: out of all the wells that actually need repair, what share did the model catch?</p>
+    <p>Standard accuracy is a poor metric here. A model that predicted every well as functional would still hit roughly 54% accuracy without ever flagging a single well for repair. The metric that matters is <strong>recall</strong>: out of all the wells that actually need repair, what share did the model catch?</p>
     <p>Four model types were trained and compared: logistic regression as a baseline, then decision tree and random forest classifiers with progressively more tuning. Feature selection via recursive feature elimination and hyperparameter tuning via GridSearchCV were applied to reduce overfitting.</p>
 
     <table class="metrics-table">
@@ -738,7 +754,7 @@
         <div class="rec-num">3</div>
         <div class="rec-content">
           <h3>Invest in better data collection</h3>
-          <p>Several potentially useful features — installer, scheme management, and construction year had significant data quality issues. More accurate and complete records would improve model performance and reduce the need for heavy preprocessing decisions that may be losing signal.</p>
+          <p>Several potentially useful features (installer, scheme management, and construction year) had significant data quality issues. More accurate and complete records would improve model performance and reduce the need for heavy preprocessing decisions that may be losing signal.</p>
         </div>
       </li>
     </ul>
@@ -753,8 +769,8 @@
     <div class="section-divider"></div>
     <ul class="finding-list">
       <li class="finding-item"><div class="finding-dot"></div>Explore gradient boosting methods (XGBoost, LightGBM) which may better balance recall and generalization than random forests</li>
-      <li class="finding-item"><div class="finding-dot"></div>Run broader hyperparameter searches with more compute — the GridSearchCV grids were constrained by time and memory</li>
-      <li class="finding-item"><div class="finding-dot"></div>Incorporate spatial features directly into the model — distance to nearest functional well and regional repair rate as engineered predictors</li>
+      <li class="finding-item"><div class="finding-dot"></div>Run broader hyperparameter searches with more compute; the GridSearchCV grids were constrained by time and memory</li>
+      <li class="finding-item"><div class="finding-dot"></div>Incorporate spatial features directly into the model, including distance to nearest functional well and regional repair rate</li>
       <li class="finding-item"><div class="finding-dot"></div>Partner with local agencies to validate predictions against ground-truth well inspections and refine the model with updated data</li>
     </ul>
   </div>
@@ -783,20 +799,14 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 // Map unlock on click
-function unlockMap(id) {
-  const frame = document.getElementById(id);
-  frame.style.pointerEvents = 'auto';
-  frame.parentElement.nextElementSibling.querySelector('.map-unlock-btn').style.display = 'none';
+function unlockMap(cardId) {
+  document.querySelectorAll('.map-card').forEach(c => c.classList.remove('unlocked'));
+  document.getElementById(cardId).classList.add('unlocked');
 }
 
 // Re-lock maps on scroll
 window.addEventListener('scroll', () => {
-  document.querySelectorAll('.map-frame').forEach(f => {
-    f.style.pointerEvents = 'none';
-  });
-  document.querySelectorAll('.map-unlock-btn').forEach(b => {
-    b.style.display = 'inline-block';
-  });
+  document.querySelectorAll('.map-card').forEach(c => c.classList.remove('unlocked'));
 }, { passive: true });
 </script>
 </body>
